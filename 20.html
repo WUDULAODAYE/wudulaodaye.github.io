@@ -179,43 +179,33 @@
 
         view.ui.add(bgExpand, "top-left");
 
-        const legendExpand = new Expand({
-          view: view,
-          content: new Legend({
-            view: view,
+       const legend1= new Legend({
+		    view:view,
             layerInfos: [
               {
                 layer: featureLayer,
                 
                 title: "Water area type"
-              }
-            ]
-          }),
-          container: document.createElement("div"),
-          expandIconClass: "esri-icon-layer-list",
-          group: "top-right"
-        });
-        
-        const legendExpand2 = new Expand({
-          view: view,
-          content: new Legend({
-            view: view,
-            layerInfos: [
-              {
+              },
+			    {
                 layer: featureLayer2,
                 
                 title: "Landform and forest type"
               }
             ]
-          }),
+          })
+
+
+     const legendExpand = new Expand({
+          view: view,
+          content: legend1,
+		  
           container: document.createElement("div"),
           expandIconClass: "esri-icon-layer-list",
           group: "top-right"
         });
-        
- 
         view.ui.add([legendExpand], "top-left");
-         view.ui.add([legendExpand2], "top-left");
+    
         
         
         const ccWidget = new CoordinateConversion({
@@ -223,6 +213,7 @@
         });
 
         view.ui.add(ccWidget, "bottom-right");
+        
         
      
       });

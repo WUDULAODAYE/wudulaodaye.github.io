@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <title>
+      Intro to MapView - Create a 2D map | Sample | ArcGIS API for JavaScript
+      4.23
+    </title>
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+      
+       #paneDiv {
+        position: absolute;
+        top: 60px;
+        right: 6px;
+        padding: 12px;
+        background-color: rgba(0, 0, 0, 0);
+        color: white;
+        width: 260px;
+      }
+    </style>
+
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/4.23/esri/themes/light/main.css"
+    />
+    <script src="https://js.arcgis.com/4.23/"></script>
+
+    <script>
+      require([
+        "esri/Map",
+        "esri/views/MapView",
+        "esri/layers/FeatureLayer",
+        "esri/widgets/Legend",
+        "esri/widgets/Search",
+        "esri/widgets/BasemapGallery",
+        "esri/widgets/LayerList",
+        "esri/widgets/Locate",
+        "esri/widgets/Expand",
+        "esri/widgets/TableList",
+        "esri/widgets/ScaleBar",
+        "esri/widgets/CoordinateConversion",
+        "esri/widgets/Swipe"
+      ], (
+        Map,
+        MapView,
+        FeatureLayer,
+        Legend,
+        Search,
+        BasemapGallery,
+        LayerList,
+        Locate,
+        Expand,
+        TableList,
+        ScaleBar,
+        CoordinateConversion,
+        Swipe
+      ) => {
+        const map = new Map({
+          basemap: "streets"
+        });
+
+
+
+       
+                
+        const featureLayer = new FeatureLayer({
+          url: "https://services.arcgis.com/As5CFN3ThbQpy8Ph/arcgis/rest/services/Freshwater_Ecoregions/FeatureServer",
+          maxScale: 1000
+        });
+        map.add(featureLayer);
+
+        const featureLayer2 = new FeatureLayer({
+          url: "https://services.arcgis.com/BG6nSlhZSAWtExvp/arcgis/rest/services/GlobalBiomes/FeatureServer",
+          maxScale: 1000
+        });
+        map.add(featureLayer2);
+
+        const view = new MapView({
+          container: "viewDiv",
+          map: map,
+          zoom: 3,
+          center: [103, 37], // longitude, latitude
+          constraints: {
+            maxZoom: 10,
+            minZoom: 2
+          }
+        });
+
+        // create a layerlist and expand widget and add to the view
+        const layerList = new LayerList({
+          view: view
+        });
+        const llExpand = new Expand({
+          view: view,
+          content: layerList,
+          expanded: false
+        });
+        view.ui.add(llExpand, "top-left");
+
+        // create a new Swipe widget
+        const swipe = new Swipe({
+          leadingLayers: [featureLayer],
+          trailingLayers: [featureLayer2],
+          position: 30, // set position of widget to 35%
+          view: view
+        });
+
+        // add the widget to the view
+        view.ui.add(swipe);
+        
+        
+        
+        
+
+        const search = new Search({
+          view: view
+        });
+
+        // places the search widget in the top right corner of the view
+        view.ui.add(search, "top-right");
+
+        const locateBtn = new Locate({
+          view: view
+        });
+
+        // Add the locate widget to the top left corner of the view
+        view.ui.add(locateBtn, {
+          position: "top-left"
+        });
+
+       
+
+        const scaleBar = new ScaleBar({
+          view: view,
+          style: "ruler",
+          unit: "metric"
+        });
+
+        view.ui.add(scaleBar, {
+          position: "bottom-left"
+        });
+
+        const basemapGallery = new BasemapGallery({
+          view: view,
+          container: document.createElement("div")
+        });
+
+        const bgExpand = new Expand({
+          view: view,
+          content: basemapGallery
+        });
+
+        // close the expand whenever a basemap is selected
+        basemapGallery.watch("activeBasemap", () => {
+          const mobileSize =
+            view.heightBreakpoint === "xsmall" ||
+            view.widthBreakpoint === "xsmall";
+
+          if (mobileSize) {
+            bgExpand.collapse();
+          }
+        });
+
+        // Add the expand instance to the ui
+
+        view.ui.add(bgExpand, "top-left");
+
+        const legendExpand = new Expand({
+          view: view,
+          content: new Legend({
+            view: view,
+            layerInfos: [
+              {
+                layer: featureLayer,
+                
+                title: "Water area type"
+              }
+            ]
+          }),
+          container: document.createElement("div"),
+          expandIconClass: "esri-icon-layer-list",
+          group: "top-right"
+        });
+        
+        const legendExpand2 = new Expand({
+          view: view,
+          content: new Legend({
+            view: view,
+            layerInfos: [
+              {
+                layer: featureLayer2,
+                
+                title: "Landform and forest type"
+              }
+            ]
+          }),
+          container: document.createElement("div"),
+          expandIconClass: "esri-icon-layer-list",
+          group: "top-right"
+        });
+        
+ 
+        view.ui.add([legendExpand], "top-left");
+         view.ui.add([legendExpand2], "top-left");
+        
+        
+        const ccWidget = new CoordinateConversion({
+          view: view
+        });
+
+        view.ui.add(ccWidget, "bottom-right");
+        
+     
+      });
+    </script>
+  </head>
+
+  <body>
+    <div id="viewDiv"></div>
+        <div id="paneDiv" class="esri-widget">
+      世界淡水生态区&全球生物群落描述了水资源和生物相似的区域，有助于了解世界上大部分地区的物种、动态和环境条件。
+    </div>
+  </body>
+</html>
